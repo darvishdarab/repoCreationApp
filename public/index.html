@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Team Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        background: #eef2f7;
+        font-family: "Inter", sans-serif;
+        color: #333;
+    }
+
+    .page-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 50px 20px;
+    }
+
+    .form-container {
+        width: 700px;
+        background: white;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0px 8px 30px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .pledge {
+        background: #eef5ff;
+        border-left: 4px solid #0066cc;
+        padding: 15px 20px;
+        margin: 20px 0 30px 0;
+        border-radius: 8px;
+        line-height: 1.6;
+        font-size: 14px;
+        color: #222;
+    }
+
+    .card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 14px;
+        border: 1px solid #e6e9ef;
+        margin-bottom: 22px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .required-tag,
+    .optional-tag {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .required-tag {
+        background: #ffdede;
+        color: #a30000;
+    }
+
+    .optional-tag {
+        background: #e9f3ff;
+        color: #0054c4;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group label {
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: #444;
+    }
+
+    .input-group input,
+    .input-group select {
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1px solid #cfd5e1;
+        font-size: 15px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: #2563eb;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+    .submit-btn:hover {
+        background: #1b4fc9;
+        transform: scale(1.02);
+    }
+
+    #response {
+        margin-top: 15px;
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+    <div class="form-container">
+
+    <h1 id="form-title">Team Registration</h1>
+
+    <div class="pledge" id="instructions-box">
+        <!-- Default instructions (overwritten by script when config loads) -->
+        Loading...
+    </div>
+
+    <form id="teamForm">
+
+        <!-- MEMBER 1 -->
+        <div class="card">
+            <div class="section-header">
+                <h2>Member 1</h2>
+                <span class="required-tag">Required</span>
+            </div>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="member1[name]" required>
+            </div>
+
+            <div class="input-group">
+                <label>JHED ID</label>
+                <input type="text" name="member1[jhed]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Github Username</label>
+                <input type="text" name="member1[github]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Github Email</label>
+                <input type="email" name="member1[email]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Section</label>
+                <select name="member1[section]" required>
+                    <option value="">-- Select --</option>
+                    <option>Section 1</option>
+                    <option>Section 2</option>
+                    <option>Section 3</option>
+                    <option>Section 4</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- MEMBER 2 -->
+        <div class="card">
+            <div class="section-header">
+                <h2>Member 2</h2>
+                <span class="required-tag">Required</span>
+            </div>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="member2[name]" required>
+            </div>
+
+            <div class="input-group">
+                <label>JHED ID</label>
+                <input type="text" name="member2[jhed]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Github Username</label>
+                <input type="text" name="member2[github]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Github Email</label>
+                <input type="email" name="member2[email]" required>
+            </div>
+
+            <div class="input-group">
+                <label>Section</label>
+                <select name="member2[section]" required>
+                    <option value="">-- Select --</option>
+                    <option>Section 1</option>
+                    <option>Section 2</option>
+                    <option>Section 3</option>
+                    <option>Section 4</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- MEMBER 3 OPTIONAL -->
+        <div id="member3-section"> 
+            <div class="card">
+                <div class="section-header">
+                    <h2>Member 3</h2>
+                    <span class="optional-tag">Optional</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" name="member3[name]">
+                </div>
+
+                <div class="input-group">
+                    <label>JHED ID</label>
+                    <input type="text" name="member3[jhed]">
+                </div>
+
+                <div class="input-group">
+                    <label>Github Username</label>
+                    <input type="text" name="member3[github]">
+                </div>
+
+                <div class="input-group">
+                    <label>Github Email</label>
+                    <input type="email" name="member3[email]">
+                </div>
+
+                <div class="input-group">
+                    <label>Section</label>
+                    <select name="member3[section]">
+                        <option value="">-- Select --</option>
+                        <option>Section 1</option>
+                        <option>Section 2</option>
+                        <option>Section 3</option>
+                        <option>Section 4</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Registration</button>
+
+        <p id="response"></p>
+    </form>
+</div>
+
+</div>
+
+<script>
+
+// =============================
+// Configure final vs midterm UI
+// =============================
+fetch("/config")
+.then(res => res.json())
+.then(cfg => {
+    const isMidterm = cfg.MIDTERM_PROJECT;
+
+    if (isMidterm) {
+        console.log("MIDTERM MODE ENABLED");
+        document.getElementById("member3-section").style.display = "none";
+        document.getElementById("form-title").textContent = "Team Registration – Midterm Project";
+
+        document.getElementById("instructions-box").innerHTML = `
+        <b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
+        You will be working in teams of 2 people only. We suggest you work with people in your section (so that you will be able to work together in class on final project days).<br><br>
+        To register your team, we need full info for each member. After you submit the form, a shared repository will be created and each member must accept the GitHub invitation.<br><br>
+        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>
+        `;
+
+    } else {
+        console.log("FINAL PROJECT MODE");
+
+        document.getElementById("member3-section").style.display = "block";
+
+        document.getElementById("instructions-box").innerHTML = `
+        <b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
+        You will be working in teams of either 2 or 3 people. We suggest you work with people in your section (so that you will be able to work together in class on final project days). All teams are expected to submit the deliverables of the project by the deadline regardless of the team size.<br><br>
+        <b>Important Note 1:</b> If you register as a team of two, a third member may be added to your team (but not guaranteed!)<br>
+        <b>Important Note 2:</b> If you do not have a team, you do not need to fill this form; you will be assigned to a team by the course staff!<br><br>
+        To register your team, we need full info for each member. After you submit the form, a shared repository will be created and each member must accept the GitHub invitation.<br><br>
+        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>
+        `;
+    }
+});
+
+// =============================
+// Form submission logic
+// =============================
+document.getElementById("teamForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    const data = {
+        member1: {},
+        member2: {},
+        member3: {}
+    };
+
+    for (const [key, value] of formData.entries()) {
+        const [member, field] = key.replace("]", "").split("[");
+        data[member][field] = value.trim();
+    }
+
+    // Remove empty member 3
+    const m3 = data.member3;
+    if (Object.values(m3).every(v => v === "")) {
+        delete data.member3;
+    }
+
+    const resEl = document.getElementById("response");
+
+    try {
+        const response = await fetch("/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const resData = await response.json();
+
+        if (response.ok) {
+            resEl.style.color = "green";
+            resEl.textContent = resData.message || "Submitted successfully!";
+        } else {
+            resEl.style.color = "red";
+            resEl.textContent = resData.error || "Error submitting.";
+        }
+    } catch (err) {
+        resEl.style.color = "red";
+        resEl.textContent = "Server error.";
+    }
+});
+</script>
+
+</body>
+</html>
