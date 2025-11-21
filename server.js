@@ -14,24 +14,30 @@ if (!GITHUB_TOKEN) {
     process.exit(1);
 }
 const ORG_NAME = "jhu-ip"; 
-const STAFFTEAM = process.env.STAFF_TEAM_NAME;
+const STAFFTEAM = process.env.STAFF_TEAM_NAME; // must be team slug
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// ==============================
+// Config endpoint
+// ==============================
 app.get("/config", (req, res) => {
-  res.json({
-    MIDTERM_PROJECT: process.env.MIDTERM_PROJECT === "true"
-  });
+    res.json({
+        MIDTERM_PROJECT: process.env.MIDTERM_PROJECT === "true"
+    });
 });
 
+// ==============================
+// CSV saving
+// ==============================
 function saveSubmissionToCSV(teamData) {
     const csvPath = path.join(__dirname, "results.csv");
     const timestamp = new Date().toISOString();
     let lines = [];
 
-    if (!fs.existsSync(csvPath)) fs.writeFileSync(csvPath, ""); 
+    if (!fs.existsSync(csvPath)) fs.writeFileSync(csvPath, "");
 
     const teamCounter = fs.readFileSync(csvPath, "utf8").split("TEAM").length - 1;
     lines.push(`TEAM ${teamCounter}`);
@@ -46,6 +52,9 @@ function saveSubmissionToCSV(teamData) {
     console.log("Saved submission to CSV");
 }
 
+// ==============================
+// GitHub API helpers
+// ==============================
 async function createRepo(repoName) {
     const response = await fetch(`https://api.github.com/orgs/${ORG_NAME}/repos`, {
         method: "POST",
@@ -64,28 +73,53 @@ async function createRepo(repoName) {
     return response.json();
 }
 
-async function addCollaborator(repoName, username) {
-    const response = await fetch(`https://api.github.com/repos/${ORG_NAME}/${repoName}/collaborators/${username}`, {
-        method: "PUT",
-        headers: {
-            "Authorization": `token ${GITHUB_TOKEN}`,
-            "Accept": "application/vnd.github+json"
-        },
-        body: JSON.stringify({ permission: "admin" })
-    });
-
-    if (!response.ok && response.status !== 201) {
-        const errorText = await response.text();
-        throw new Error(`Adding collaborator ${username} failed: ${errorText}`);
+async function addCollaborator(repoName, usernameOrTeam) {
+    // crude check: if starts with STAFFTEAM slug, treat as team
+    if (usernameOrTeam === STAFFTEAM) {
+        // add team
+        const response = await fetch(`https://api.github.com/orgs/${ORG_NAME}/teams/${usernameOrTeam}/repos/${ORG_NAME}/${repoName}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Accept": "application/vnd.github+json"
+            },
+            body: JSON.stringify({ permission: "admin" })
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Adding team ${usernameOrTeam} failed: ${errorText}`);
+        }
+        console.log(`Added team ${usernameOrTeam} to ${repoName}`);
+    } else {
+        // add individual user
+        const response = await fetch(`https://api.github.com/repos/${ORG_NAME}/${repoName}/collaborators/${usernameOrTeam}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Accept": "application/vnd.github+json"
+            },
+            body: JSON.stringify({ permission: "admin" })
+        });
+        if (!response.ok && response.status !== 201) {
+            const errorText = await response.text();
+            throw new Error(`Adding collaborator ${usernameOrTeam} failed: ${errorText}`);
+        }
+        console.log(`Added collaborator ${usernameOrTeam} to ${repoName}`);
     }
 }
 
+// ==============================
+// Validation
+// ==============================
 function validateMember(member) {
     if (!member) return false;
     const requiredFields = ["name", "jhed", "github", "email", "section"];
     return requiredFields.every(f => member[f] && member[f].trim() !== "");
 }
 
+// ==============================
+// Submission endpoint
+// ==============================
 app.post("/submit", async (req, res) => {
     const { member1, member2, member3 } = req.body;
 
@@ -107,15 +141,18 @@ app.post("/submit", async (req, res) => {
     if (isMidterm) repoName = `${REPO_NAME_PREFIX}-midterm-${members[0].jhed}-${members[1].jhed}`;
     else repoName = `${REPO_NAME_PREFIX}-final-${members.map(m => m.jhed).join("-")}`;
 
+    // Add staff team
     membersToAdd.push(STAFFTEAM);
 
     try {
         console.log(`Creating repo: ${repoName}`);
         await createRepo(repoName);
-        for (const username of membersToAdd) {
-            console.log(`Adding collaborator: ${username}`);
-            await addCollaborator(repoName, username);
+
+        for (const usernameOrTeam of membersToAdd) {
+            console.log(`Adding collaborator/team: ${usernameOrTeam}`);
+            await addCollaborator(repoName, usernameOrTeam);
         }
+
         res.json({ success: true, message: `Repository "${repoName}" created and collaborators added.` });
     } catch (err) {
         console.error("Error:", err.message);
@@ -123,4 +160,7 @@ app.post("/submit", async (req, res) => {
     }
 });
 
+// ==============================
+// Start server
+// ==============================
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

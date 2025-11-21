@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.disabled = true;
         spinner.style.display = "block";
 
-        await new Promise(r => setTimeout(r, 50));
+        await new Promise(requestAnimationFrame);
 
         const formData = new FormData(formEl);
         const data = { member1: {}, member2: {}, member3: {} };
