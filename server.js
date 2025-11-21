@@ -1,4 +1,4 @@
-import { saveResultsToGithub } from "saveResultsToGithub.js";
+import { saveResultsToGithub } from "./saveResultsToGithub.js";
 
 const express = require("express");
 const cors = require("cors");
