@@ -1,10 +1,12 @@
+import { fileURLToPath } from "url";
+import path from "path";
+import express from "express";
+import cors from "cors";
+import fetch from "node-fetch";
 import { saveResultsToGithub } from "./saveResultsToGithub.js";
 
-const express = require("express");
-const cors = require("cors");
-const fs = require("fs");
-const path = require("path");
-const fetch = require("node-fetch");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
