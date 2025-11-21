@@ -1,1 +1,9 @@
-This little app currently capable of creating both midterm and final project repositories. It's deployed on render and all you need to do is to set the environment variables there. Set the env variable "midterm_project" to true if it's for midterm project and set it to false for final projects. Also set the repo name prefix variable based on the semester and year. Finally set the staff team variable. Ideally this app should be modified to allow saving the team entries in a Google doc or something so it requires integration with Google Drive. Right now it writes the results into results.csv but the free version of render doesn't allow accessing files.
+This little app currently capable of creating both midterm and final project repositories. It's deployed on render and all you need to do is to set the environment variables there. Set the env variable "midterm_project" to true if it's for midterm project and set it to false for final projects. Also set the repo_name_prefix variable based on the semester and year. Finally set the staff_team variable. results of team submissions are written into csv files in RESULTS_REPO_NAME.
+
+list of env vars:
+
+STAFF_TEAM_NAME: e.g. cs220-f25-staff
+RESULTS_REPO_NAME: e.g. student_submitted_teams_results
+REPO_NAME_PREFIX: e.g. 2026-spring 
+MIDTERM_PROJECT: true or false
+GITHUB_TOKEN: must have enough accesses
