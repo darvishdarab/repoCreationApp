@@ -1,3 +1,5 @@
+import { saveResultsToGithub } from "saveResultsToGithub.js";
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -20,6 +22,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+
 // ==============================
 // Config endpoint
 // ==============================
@@ -28,29 +31,6 @@ app.get("/config", (req, res) => {
         MIDTERM_PROJECT: process.env.MIDTERM_PROJECT === "true"
     });
 });
-
-// ==============================
-// CSV saving
-// ==============================
-function saveSubmissionToCSV(teamData) {
-    const csvPath = path.join(__dirname, "results.csv");
-    const timestamp = new Date().toISOString();
-    let lines = [];
-
-    if (!fs.existsSync(csvPath)) fs.writeFileSync(csvPath, "");
-
-    const teamCounter = fs.readFileSync(csvPath, "utf8").split("TEAM").length - 1;
-    lines.push(`TEAM ${teamCounter}`);
-
-    Object.keys(teamData).forEach(key => {
-        const member = teamData[key];
-        if (!member) return;
-        lines.push(`${member.name || ""},${member.jhed || ""},${member.github || ""},${member.email || ""},${member.section || ""},${timestamp}`);
-    });
-
-    fs.appendFileSync(csvPath, lines.join("\n") + "\n");
-    console.log("Saved submission to CSV");
-}
 
 // ==============================
 // GitHub API helpers
@@ -129,11 +109,25 @@ app.post("/submit", async (req, res) => {
     if (member3 && !validateMember(member3)) {
         return res.status(400).json({ error: "If Member 3 is provided, all fields must be filled." });
     }
+    const members = [member1, member2, member3].filter(m => m && m.jhed && m.jhed.trim() !== "");
+    
+    const timestamp = new Date().toISOString();
 
-    saveSubmissionToCSV({ member1, member2, member3 });
+    const row = [
+        timestamp,
+        ...members.flatMap(m => [
+            m.name,
+            m.jhed,
+            m.github,
+            m.email,
+            m.section
+        ])
+    ].join(",");
+
+
+    await saveResultsToGithub(row);
 
     const isMidterm = process.env.MIDTERM_PROJECT === "true";
-    const members = [member1, member2, member3].filter(m => m && m.jhed && m.jhed.trim() !== "");
     let repoName;
     const membersToAdd = [member1.github, member2.github];
     if (member3) membersToAdd.push(member3.github);
