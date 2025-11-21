@@ -329,6 +329,8 @@ document.getElementById("teamForm").addEventListener("submit", async (e) => {
     submitBtn.disabled = true;
     spinner.style.display = "block"; // show spinner
 
+    await new Promise(r => setTimeout(r, 50));
+    
     const formData = new FormData(formEl);
     const data = { member1: {}, member2: {}, member3: {} };
     for (const [key, value] of formData.entries()) {
