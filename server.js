@@ -6,6 +6,7 @@ const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const REPO_NAME_PREFIX = process.env.REPO_NAME_PREFIX;
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 if (!GITHUB_TOKEN) {
@@ -103,8 +104,8 @@ app.post("/submit", async (req, res) => {
     const membersToAdd = [member1.github, member2.github];
     if (member3) membersToAdd.push(member3.github);
 
-    if (isMidterm) repoName = `2026-spring-midterm-${members[0].jhed}-${members[1].jhed}`;
-    else repoName = `2026-spring-final-${members.map(m => m.jhed).join("-")}`;
+    if (isMidterm) repoName = `${REPO_NAME_PREFIX}-midterm-${members[0].jhed}-${members[1].jhed}`;
+    else repoName = `${REPO_NAME_PREFIX}-final-${members.map(m => m.jhed).join("-")}`;
 
     membersToAdd.push(STAFFTEAM);
 
