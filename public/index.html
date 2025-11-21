@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="UTF-8">
@@ -7,6 +6,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
+    
+    #spinner {
+    display: none;
+    margin: 20px auto;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #2563eb;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
     body {
         margin: 0;
         background: #eef2f7;
@@ -126,6 +141,20 @@
     #response {
         margin-top: 15px;
         text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    #confirmation-page {
+        display: none;
+        text-align: center;
+        padding: 50px 20px;
+        font-size: 18px;
+        color: #006600;
+    }
+
+    #confirmation-page.error {
+        color: #a30000;
     }
 </style>
 </head>
@@ -138,39 +167,40 @@
     <h1 id="form-title">Team Registration</h1>
 
     <div class="pledge" id="instructions-box">
-        <!-- Default instructions (overwritten by script when config loads) -->
-        Loading...
+        <b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
+        You will be working in teams of either 2 or 3 people. We suggest you work with people in your section 
+        (so that you will be able to work together in class on final project days). All teams are expected 
+        to submit the deliverables of the project by the deadline regardless of the team size.<br><br>
+        <b>Important Note 1:</b> If you register as a team of two, a third member <b>may</b> be added to your team (but not guaranteed!)<br>
+        <b>Important Note 2:</b> If you do not have a team, you do not need to fill this form; you will be assigned to a team by the course staff!<br><br>
+        To register your team, we need full info for each member. After you submit the form, a shared repository will be created and each member must accept the GitHub invitation.<br><br>
+        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>
     </div>
 
     <form id="teamForm">
-
+        <div id="spinner"></div>
         <!-- MEMBER 1 -->
         <div class="card">
             <div class="section-header">
                 <h2>Member 1</h2>
                 <span class="required-tag">Required</span>
             </div>
-
             <div class="input-group">
                 <label>Full Name</label>
                 <input type="text" name="member1[name]" required>
             </div>
-
             <div class="input-group">
                 <label>JHED ID</label>
                 <input type="text" name="member1[jhed]" required>
             </div>
-
             <div class="input-group">
                 <label>Github Username</label>
                 <input type="text" name="member1[github]" required>
             </div>
-
             <div class="input-group">
                 <label>Github Email</label>
                 <input type="email" name="member1[email]" required>
             </div>
-
             <div class="input-group">
                 <label>Section</label>
                 <select name="member1[section]" required>
@@ -189,27 +219,22 @@
                 <h2>Member 2</h2>
                 <span class="required-tag">Required</span>
             </div>
-
             <div class="input-group">
                 <label>Full Name</label>
                 <input type="text" name="member2[name]" required>
             </div>
-
             <div class="input-group">
                 <label>JHED ID</label>
                 <input type="text" name="member2[jhed]" required>
             </div>
-
             <div class="input-group">
                 <label>Github Username</label>
                 <input type="text" name="member2[github]" required>
             </div>
-
             <div class="input-group">
                 <label>Github Email</label>
                 <input type="email" name="member2[email]" required>
             </div>
-
             <div class="input-group">
                 <label>Section</label>
                 <select name="member2[section]" required>
@@ -229,27 +254,22 @@
                     <h2>Member 3</h2>
                     <span class="optional-tag">Optional</span>
                 </div>
-
                 <div class="input-group">
                     <label>Full Name</label>
                     <input type="text" name="member3[name]">
                 </div>
-
                 <div class="input-group">
                     <label>JHED ID</label>
                     <input type="text" name="member3[jhed]">
                 </div>
-
                 <div class="input-group">
                     <label>Github Username</label>
                     <input type="text" name="member3[github]">
                 </div>
-
                 <div class="input-group">
                     <label>Github Email</label>
                     <input type="email" name="member3[email]">
                 </div>
-
                 <div class="input-group">
                     <label>Section</label>
                     <select name="member3[section]">
@@ -263,16 +283,18 @@
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Submit Registration</button>
+        <button type="submit" id="submitBtn" class="submit-btn">Submit Registration</button>
 
         <p id="response"></p>
     </form>
-</div>
 
+    <!-- Confirmation / Error Page -->
+    <div id="confirmation-page"></div>
+
+</div>
 </div>
 
 <script>
-
 // =============================
 // Configure final vs midterm UI
 // =============================
@@ -280,61 +302,42 @@ fetch("/config")
 .then(res => res.json())
 .then(cfg => {
     const isMidterm = cfg.MIDTERM_PROJECT;
-
     if (isMidterm) {
         console.log("MIDTERM MODE ENABLED");
         document.getElementById("member3-section").style.display = "none";
         document.getElementById("form-title").textContent = "Team Registration – Midterm Project";
-
-        document.getElementById("instructions-box").innerHTML = `
-        <b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
+        document.getElementById("instructions-box").innerHTML =
+        `<b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
         You will be working in teams of 2 people only. We suggest you work with people in your section (so that you will be able to work together in class on final project days).<br><br>
         To register your team, we need full info for each member. After you submit the form, a shared repository will be created and each member must accept the GitHub invitation.<br><br>
-        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>
-        `;
-
+        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>`;
     } else {
         console.log("FINAL PROJECT MODE");
-
         document.getElementById("member3-section").style.display = "block";
-
-        document.getElementById("instructions-box").innerHTML = `
-        <b>** ONLY FILL THIS FORM ONCE PER TEAM! **</b><br><br>
-        You will be working in teams of either 2 or 3 people. We suggest you work with people in your section (so that you will be able to work together in class on final project days). All teams are expected to submit the deliverables of the project by the deadline regardless of the team size.<br><br>
-        <b>Important Note 1:</b> If you register as a team of two, a third member may be added to your team (but not guaranteed!)<br>
-        <b>Important Note 2:</b> If you do not have a team, you do not need to fill this form; you will be assigned to a team by the course staff!<br><br>
-        To register your team, we need full info for each member. After you submit the form, a shared repository will be created and each member must accept the GitHub invitation.<br><br>
-        <b>** Only fill this form ONCE PER TEAM (NOT PER MEMBER!) **</b>
-        `;
     }
 });
 
-// =============================
-// Form submission logic
-// =============================
 document.getElementById("teamForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
+    const submitBtn = document.getElementById("submitBtn");
+    const spinner = document.getElementById("spinner");
+    const formEl = document.getElementById("teamForm");
+    const responseDiv = document.getElementById("confirmation-page");
 
-    const data = {
-        member1: {},
-        member2: {},
-        member3: {}
-    };
+    submitBtn.disabled = true;
+    spinner.style.display = "block"; // show spinner
 
+    const formData = new FormData(formEl);
+    const data = { member1: {}, member2: {}, member3: {} };
     for (const [key, value] of formData.entries()) {
         const [member, field] = key.replace("]", "").split("[");
         data[member][field] = value.trim();
     }
 
-    // Remove empty member 3
-    const m3 = data.member3;
-    if (Object.values(m3).every(v => v === "")) {
+    if (data.member3 && Object.values(data.member3).every(v => v === "")) {
         delete data.member3;
     }
-
-    const resEl = document.getElementById("response");
 
     try {
         const response = await fetch("/submit", {
@@ -344,19 +347,30 @@ document.getElementById("teamForm").addEventListener("submit", async (e) => {
         });
 
         const resData = await response.json();
+        spinner.style.display = "none"; // hide spinner
+        formEl.style.display = "none";
 
         if (response.ok) {
-            resEl.style.color = "green";
-            resEl.textContent = resData.message || "Submitted successfully!";
+            responseDiv.classList.remove("error");
+            responseDiv.textContent = "✅ Team repository is created and team members are invited. Check your mailboxes.";
         } else {
-            resEl.style.color = "red";
-            resEl.textContent = resData.error || "Error submitting.";
+            responseDiv.classList.add("error");
+            responseDiv.textContent = `❌ Error: ${resData.error || "Unknown error occurred."}`;
+            submitBtn.disabled = false;
+            formEl.style.display = "block";
         }
+        responseDiv.style.display = "block";
+
     } catch (err) {
-        resEl.style.color = "red";
-        resEl.textContent = "Server error.";
+        spinner.style.display = "none";
+        responseDiv.classList.add("error");
+        responseDiv.textContent = "❌ Server error. Please try again later.";
+        responseDiv.style.display = "block";
+        submitBtn.disabled = false;
+        formEl.style.display = "block";
     }
 });
+
 </script>
 
 </body>
