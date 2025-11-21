@@ -190,15 +190,33 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const formEl = document.getElementById("teamForm");
     const submitBtn = document.getElementById("submitBtn");
     const responseDiv = document.getElementById("confirmation-page");
+    const member3Section = document.getElementById("member3-section");
 
+    // =====================
+    // Fetch server config
+    // =====================
+    try {
+        const configRes = await fetch("/config");
+        const config = await configRes.json();
+
+        if (config.MIDTERM_PROJECT) {
+            // Hide Member 3 section completely
+            member3Section.style.display = "none";
+        }
+    } catch (err) {
+        console.error("Failed to fetch config:", err);
+    }
+
+    // =====================
+    // Form submission
+    // =====================
     formEl.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // Immediately disable the submit button
         submitBtn.disabled = true;
 
         const formData = new FormData(formEl);
@@ -222,13 +240,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 responseDiv.classList.remove("error");
                 responseDiv.textContent = "✅ Team repository is created and team members are invited. Check your mailboxes.";
             } else {
-                submitBtn.disabled = false; // Re-enable if server returns error
+                submitBtn.disabled = false;
                 responseDiv.classList.add("error");
                 responseDiv.textContent = `❌ Error: ${resData.error || "Unknown error occurred."}`;
             }
             responseDiv.style.display = "block";
         } catch(err) {
-            submitBtn.disabled = false; // Re-enable on network error
+            submitBtn.disabled = false;
             responseDiv.classList.add("error");
             responseDiv.textContent = "❌ Server error. Please try again later.";
             responseDiv.style.display = "block";
